@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IEP/ICEP Calculator</title>
+</head>
+<body>
+  <h1>IEP/ICEP Calculator</h1>
+  <select id="coverage-option">
+    <option value="ma">MA (Medical-Only Coverage)</option>
+    <option value="madp">MADP (Medical and Part D Coverage)</option>
+    <option value="pdp">PDP (Part D Coverage)</option>
+  </select>
+  <input type="date" id="part-a-effective-date">
+  <input type="date" id="part-b-effective-date">
+  <input type="date" id="part-d-effective-date">
+  <input type="checkbox" id="use-current-date">
+  <label for="use-current-date">Use current date</label>
+  <button type="button" id="calculate-button">Calculate Eligibility</button>
+  <p id="eligibility-message"></p>
+  <br>
+  <br>
+  <pre style="font-size: 20px;">
+    1. To be eligible for MA (Medical-Only Coverage), the following conditions must be met:
+    >> The current date must be between your Part A and Part B effective dates.
+    >> The difference between the current date and your Part B effective date must be within 3 months.
+    
+    2. To be eligible for PDP (Part D Coverage), the following conditions must be met:
+    >> You must be enrolled in Medicare Part A or Part B. Then you can select Part D.
+    
+    3. To be eligible for MADP (Medical and Part D Coverage), the following conditions must be met:
+    >> You must be enrolled in Medicare Part A and Part B.
+    >> You must be enrolled in a Medicare Advantage plan that offers Part D coverage.</pre>
+
+  <script>
+    const calculateEligibility = () => {
+      const coverageOption = document.querySelector('#coverage-option').value;
+      const useCurrentDate = document.querySelector('#use-current-date').checked;
+
+      // Calculate the current date if the checkbox is checked.
+      const currentDate = useCurrentDate ? new Date() : new Date(document.querySelector('#part-a-effective-date').value);
+
+      // Calculate the difference between the current date and the Part B effective date.
+      const partBDiffDays = (currentDate - new Date(document.querySelector('#part-b-effective-date').value)) / (1000 * 60 * 60 * 24);
+
+      // Calculate the difference between the current date and the Part D effective date.
+      const partDDiffDays = (currentDate - new Date(document.querySelector('#part-d-effective-date').value)) / (1000 * 60 * 60 * 24);
+
+      // Determine eligibility based on the selected coverage option and date inputs.
+      let eligibilityMessage = '';
+      switch (coverageOption) {
+        case 'ma':
+          if (partBDiffDays <= 90) {
+            eligibilityMessage = 'You are eligible for MA enrollment.';
+          } else {
+            eligibilityMessage = 'You are not eligible for MA enrollment.';
+          }
+          break;
+        case 'madp':
+          if (partBDiffDays <= 90 && partDDiffDays <= 90) {
+            eligibilityMessage = 'You are eligible for MADP enrollment.';
+          } else {
+            eligibilityMessage = 'You are not eligible for MADP enrollment.';
+          }
+          break;
+        case 'pdp':
+          if (partBDiffDays <= 90 && partDDiffDays <= 90) {
+            eligibilityMessage = 'You are eligible for PDP enrollment.';
+          } else {
+            eligibilityMessage = 'You are not eligible for PDP enrollment.';
+          }
+          break;
+      }
+
+      // Display the eligibility message.
+      document.querySelector('#eligibility-message').innerHTML = eligibilityMessage;
+    };
+
+    document.querySelector('#calculate-button').addEventListener('click', calculateEligibility);
+  </script>
+</body>
+</html>
